@@ -64,7 +64,7 @@ jobs:
           cd refactored-robot/values
 
           # Set image.tag to the GitHub SHA (built image tag)
-          yq e '.image.tag = "${{ github.sha }}"' -i dev.yaml
+          yq e '.image.tag = "${{ github.sha }}"' -i common.yaml
 
           git commit -am "chore(dev): deploy image with tag ${{ github.sha }}"
           git notes append -m "image: ghcr.io/${{ github.repository_owner }}/demo-app:${{ github.sha }}"
