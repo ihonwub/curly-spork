@@ -60,8 +60,8 @@ jobs:
           git config --global user.name "Deploy Bot"
           git config --global user.email "no-reply@noreply.com"
 
-          git clone https://bot:${{ secrets.DEPLOY_PAT }}@github.com/${{ github.repository_owner }}/refactored-robot.git
-          cd refactored-robot/values
+          git clone https://bot:${{ secrets.DEPLOY_PAT }}@github.com/${{ github.repository_owner }}/refactored-droid.git
+          cd refactored-droid/values
 
           # Set image.tag to the GitHub SHA (built image tag)
           yq e '.image.tag = "${{ github.sha }}"' -i values.common.yaml
