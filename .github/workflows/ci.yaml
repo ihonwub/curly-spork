@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'Dockerfile'           # Only trigger on Dockerfile changes
+      - '.github/workflows/**' # Or workflow changes
+      - '!*.md'                # Exclude all markdown files
 jobs:
   build-and-push-image:
     name: Build and Push Docker images
