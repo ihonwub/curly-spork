@@ -66,7 +66,7 @@ jobs:
           # Set image.tag to the GitHub SHA (built image tag)
           yq e '.image.tag = "${{ github.sha }}"' -i values.common.yaml
 
-          git commit -am "chore(dev): deploy image with tag ${{ github.sha }}"
+          git commit -a -m "chore(dev): deploy demo-app:${{ github.sha }}"
           git notes append -m "image: ghcr.io/${{ github.repository_owner }}/demo-app:${{ github.sha }}"
           git push origin "refs/notes/*" --force
           git push --force
