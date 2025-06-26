@@ -4,9 +4,18 @@ A Docker-based project that builds customizable color variants of OpenShift roll
 
 ## Overview
 
-This project uses the OpenShift rollouts demo base image and allows you to build different color variants for testing and demonstration purposes.
+This project is based on `quay.io/openshiftdemos/rollouts-demo`, which provides a simple web application for demonstrating rollout strategies.
 
-## Usage
+## Available Colors
+
+The base image supports various colors. Common options include:
+- green (default)
+- blue
+- red
+- yellow
+- orange
+- purple
+
 
 ### Build the Docker image
 
@@ -26,21 +35,9 @@ docker build --build-arg COLOR=blue -t curly-spork:blue .
 docker run -p 8080:8080 curly-spork
 ```
 
-## Available Colors
-
-The base image supports various colors. Common options include:
-- green (default)
-- blue
-- red
-- yellow
-
-## Base Image
-
-This project is based on `quay.io/openshiftdemos/rollouts-demo`, which provides a simple web application for demonstrating OpenShift rollout strategies.
-
 ## CI/CD Pipeline
 
-The project includes a comprehensive GitHub Actions workflow (`.github/workflows/ci.yaml`) that implements a complete GitOps deployment pipeline with advanced commit tracking capabilities.
+The project also includes a comprehensive GitHub Actions workflow (`.github/workflows/ci.yaml`) that implements a  GitOps deployment pipeline with commit tracking capabilities.
 
 ### Workflow Overview
 
@@ -73,7 +70,7 @@ The CI/CD pipeline consists of two main jobs:
 
 **Commit Tracking & Metadata**:
 
-The workflow implements sophisticated commit tracking through multiple mechanisms:
+The workflow implements  commit tracking through multiple mechanisms:
 
 1. **Structured Commit Messages**: 
    - Format: `chore(dev): deploy <full-image-name-with-tag>`
@@ -90,7 +87,7 @@ The workflow implements sophisticated commit tracking through multiple mechanism
 
 3. **Promotion Workflow Support**:
    - Git Notes enable automated promotion pipelines to query deployment state
-   - Supports environment progression (dev ’ staging ’ production)
+   - Supports environment progression (dev ï¿½ staging ï¿½ production)
    - Provides deployment audit trail for compliance and rollback scenarios
 
 **Git Configuration**:
@@ -117,20 +114,11 @@ git notes show <commit-hash>
 git log --notes --grep="env: dev" -1
 ```
 
-### Security Considerations
+## GitOps Repository
 
-- Uses GitHub's built-in `GITHUB_TOKEN` for container registry authentication
-- Requires `DEPLOY_PAT` secret for cross-repository deployment updates
-- Follows principle of least privilege with specific permission scopes
-- Repository secrets are managed through GitHub's encrypted secrets system
+For the complete GitOps deployment configuration and rendered Kubernetes manifests, see the deployment repository: [refactored-robot](https://github.com/ihonwub/refactored-robot)
 
-### GitOps Benefits
-
-This implementation provides:
-- **Declarative Configuration**: All deployment state is stored in version control
-- **Audit Trail**: Complete history of what was deployed when and by whom
-- **Rollback Capability**: Easy reversion using git history and commit SHAs
-- **Environment Isolation**: Separate configuration files for different environments
-- **Automated Consistency**: Reduces manual deployment errors and configuration drift
-
-The combination of structured commits and Git Notes creates a robust deployment tracking system that supports both human operators and automated tooling for managing application lifecycles across multiple environments.
+This repository contains:
+- Helm values for different environments (`values/envs/`)
+- Rendered Kubernetes manifests
+- GitOps deployment patterns and best practices
