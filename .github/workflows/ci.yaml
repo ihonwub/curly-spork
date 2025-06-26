@@ -1,10 +1,9 @@
+# Update your curly-spork CI/CD workflow
 name: CI/CD
-
 on:
   push:
     branches:
       - main
-
 jobs:
   build-and-push-image:
     name: Build and Push Docker images
@@ -12,7 +11,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-
     outputs:
       image: ${{ steps.push-image.outputs.image }}
     
@@ -32,7 +30,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
+      
       # GHCR requires lowercase.
       - id: repolower
         uses: ASzc/change-string-case-action@v5
@@ -54,19 +52,20 @@ jobs:
         run: |
           sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq
-
+      
       - name: Update image tag in Helm values
         run: |
           git config --global user.name "Deploy Bot"
           git config --global user.email "no-reply@noreply.com"
-
-          git clone https://bot:${{ secrets.DEPLOY_PAT }}@github.com/${{ github.repository_owner }}/refactored-droid.git
-          cd refactored-droid/values
-
+          git clone https://bot:${{ secrets.DEPLOY_PAT }}@github.com/${{ github.repository_owner }}/refactored-robot.git
+          cd refactored-robot
+          
           # Set image.tag to the GitHub SHA (built image tag)
-          yq e '.image.tag = "${{ github.sha }}"' -i values.common.yaml
-
-          git commit -am "chore(dev): deploy image with tag ${{ github.sha }}"
-          git notes append -m "image: ghcr.io/${{ github.repository_owner }}/demo-app:${{ github.sha }}"
+          yq e '.image.tag = "${{ github.sha }}"' -i values/envs/dev.yaml
+          git add values/envs/dev.yaml
+          git commit -m "chore(dev): deploy image with tag ${{ github.sha }}"
+          
+          # Add Git Notes with full image path and environment
+          git notes add -m "image: ghcr.io/${{ github.repository_owner }}/curly-spork:${{ github.sha }}" -m "env: dev" --force
           git push origin "refs/notes/*" --force
-          git push --force
+          git push origin main
