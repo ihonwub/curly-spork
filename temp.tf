@@ -1,6 +1,19 @@
 locals {
-  job_identifier = coalesce(var.job_identifier, "NOT_SET")
-  full_name      = var.name != "NOT_SET" ? "${var.name}-${local.job_identifier}" : local.job_identifier
+  # Configuration
+  name                       = "myapp"
+  job_identifier            = "dev"
+  full_name                 = "${local.name}-${local.job_identifier}"
+  
+  # EKS OIDC provider (without https://)
+  oidc_provider             = "oidc.eks.us-east-1.amazonaws.com/id/EXAMPLED539D4633E53DE1B71EXAMPLE"
+  
+  # Service account info
+  service_account_namespace = "default"
+  service_account_name      = "myapp-sa"
+  
+  # Secrets
+  database_password         = "changeme-db-password"
+  api_key                  = "changeme-api-key"
 }
 
 # Data sources
@@ -25,22 +38,10 @@ data "aws_iam_policy_document" "assume_role" {
     
     principals {
       type        = "Federated"
-      identifiers = ["arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider}"]
+      identifiers = ["arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${local.oidc_provider}"]
     }
     
     actions = ["sts:AssumeRoleWithWebIdentity"]
-    
-    condition {
-      test     = "StringEquals"
-      variable = "${var.oidc_provider}:sub"
-      values   = ["system:serviceaccount:${var.service_account_namespace}:${var.service_account_name}"]
-    }
-    
-    condition {
-      test     = "StringEquals"
-      variable = "${var.oidc_provider}:aud"
-      values   = ["sts.amazonaws.com"]
-    }
   }
 }
 
@@ -82,8 +83,8 @@ resource "aws_secretsmanager_secret_version" "webapp" {
   secret_id = aws_secretsmanager_secret.webapp.id
   
   secret_string = jsonencode({
-    database_password = var.database_password
-    api_key          = var.api_key
+    database_password = local.database_password
+    api_key          = local.api_key
   })
 }
 
